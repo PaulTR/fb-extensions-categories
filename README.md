@@ -1,20 +1,19 @@
-# Entity Analysis
+# Sentence Classification
 
 **Author**: Firebase (**[https://firebase.google.com](https://firebase.google.com)**)
 
-**Description**: Analyzes a sentence added to Firestore and pulls out the entities. More information on entities can be found [here](https://cloud.google.com/natural-language/docs/reference/rest/v1/Entity)
+**Description**: Analyzes a sentence added to Firestore and classifies it. More information on categories can be found [here](https://cloud.google.com/natural-language/docs/categories)
 
 
-
-**Details**: Use this extension to analyze strings written to a Cloud Firestore collection and extracts entities for further processing.
+**Details**: Use this extension to analyze strings written to a Cloud Firestore collection and attempts to classify them into a set of categories.
 
 This extension listens to your specified Cloud Firestore collection. If you add a string to a specified field in any document within that collection, this extension:
 
-- Processes the text using Google Cloud's Natural Language Processing API and extracts the entities from that text.
-- Adds the entities of the string to a separate specified field in the same document.
+- Processes the text using Google Cloud's Natural Language Processing API and attempts to classify that text.
+- Adds the categories of the string to a separate specified field in the same document.
 
 
-If the original field of the document is updated, then the entities will be automatically updated, as well.
+If the original field of the document is updated, then the categories will be automatically updated, as well.
 
 #### Additional setup
 
@@ -39,26 +38,20 @@ To install an extension, your project must be on the [Blaze (pay as you go) plan
 * Input field name: What is the name of the field that contains the string that you want to analyze?
 
 
-* Entities output field name: What is the name of the field where you want to store the string's entities data?
-
-
+* Categories output field name: What is the name of the field where you want to store the string's categories?
 
 
 **Cloud Functions:**
 
-* **fsentities:** Listens for writes of new strings to your specified Cloud Firestore collection, determines the entitites, then writes them back to the same document.
+* **fscategories:** Listens for writes of new strings to your specified Cloud Firestore collection, determines the categories, then writes them back to the same document.
 
 
 
 **APIs Used**:
 
-* language.googleapis.com (Reason: To use Google Natural Language Processing to apply entity analysis.)
-
-
+* language.googleapis.com (Reason: To use Google Natural Language Processing to apply category analysis.)
 
 **Access Required**:
-
-
 
 This extension will operate with the following project IAM roles:
 

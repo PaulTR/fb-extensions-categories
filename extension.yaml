@@ -1,8 +1,8 @@
-name: entity-analysis
+name: category-analysis
 version: 0.0.1
 specVersion: v1beta  # Firebase Extensions specification version (do not edit)
 
-displayName: Entity Analysis
+displayName: Sentence Categorization
 description: Determines the sentiment magnitude and score for given text values in Firestore
 
 license: Apache-2.0  # The license you want for the extension
@@ -23,7 +23,7 @@ billingRequired: true
 
 apis:
   - apiName: language.googleapis.com
-    reason: To use Google Natural Language Processing to apply entity analysis.
+    reason: To use Google Natural Language Processing to apply category analysis.
 
 # https://cloud.google.com/datastore/docs/access/iam
 roles:
@@ -31,11 +31,10 @@ roles:
     reason: Allows the extension to write to your Firestore Database instance.
 
 resources:
-  - name: fsentity
+  - name: fscategories
     type: firebaseextensions.v1beta.function
     description:
-      Listens for writes of new strings to your specified Cloud Firestore collection, extracts entities,
-      then writes the entity data back to the same document.
+      Listens for writes of new strings to your specified Cloud Firestore collection, determines the categories, then writes them back to the same document.
     properties:
       location: ${LOCATION}
       runtime: nodejs12
@@ -93,9 +92,9 @@ params:
     required: true
 
   - param: OUTPUT_FIELD_NAME
-    label: Entity output field name
+    label: Catagories output field name
     description: >
-      What is the name of the field where you want to store your entity information?
-    example: entities
-    default: entities
+      What is the name of the field where you want to store your text's categories?
+    example: catagories
+    default: catagories
     required: true

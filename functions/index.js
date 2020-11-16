@@ -17,11 +17,11 @@ var ChangeType;
 
 admin.initializeApp();
 
-exports.fsentity = functions.handler.firestore.document.onWrite(async (change) => {
+exports.fscategories = functions.handler.firestore.document.onWrite(async (change) => {
     const { inputFieldName, outputFieldName } = config_1.default;
 
     if (inputFieldName == outputFieldName) {
-        console.log("Entity analysis: input field cannot be the same as output field. Please reconfigure your extension.");
+        console.log("Category analysis: input field cannot be the same as output field. Please reconfigure your extension.");
         return;
     }
     
@@ -40,7 +40,7 @@ exports.fsentity = functions.handler.firestore.document.onWrite(async (change) =
         }
     }
     catch (err) {
-        console.log("Entity extension error: " + err);
+        console.log("Category extension error: " + err);
     }
 });
 
@@ -60,7 +60,7 @@ const getChangeType = (change) => {
 const handleCreateDocument = async (snapshot) => {
     const input = extractInput(snapshot);
     if (input) {
-        await findEntities(snapshot);
+        await findCategories(snapshot);
     }
 };
 
@@ -76,32 +76,32 @@ const handleUpdateDocument = async (before, after) => {
             return;
         }
     if (inputAfter) {
-        await findEntities(after);
+        await findCategories(after);
     }
     else if (inputBefore) {
-        await updateEntities(after, admin.firestore.FieldValue.delete());
+        await updateCategories(after, admin.firestore.FieldValue.delete());
     }
 };
 
-const findEntities = async (snapshot) => {
+const findCategories = async (snapshot) => {
     const input = extractInput(snapshot);
-    const result = await getEntities(input);
+    const result = await getCategories(input);
     try {
-        await updateEntities(snapshot, result);
+        await updateCategories(snapshot, result);
     }
     catch (err) {
         throw err;
     }
 };
 
-const getEntities = async (input_value) => {
+const getCategories = async (input_value) => {
     try {
         const document = {
             content: input_value,
             type: 'PLAIN_TEXT',
         };
-        const [result] = await client.analyzeEntities({document});
-        return result.entities;
+        const [result] = await client.classifyText({document});
+        return result.categories;
     }
     catch (err) {
         throw err;
@@ -109,10 +109,9 @@ const getEntities = async (input_value) => {
 };
 
 //TODO change to array writing
-const updateEntities = async (snapshot, entities) => {
-    snapshot.ref.set({entities}, {merge: true});
+const updateCategories = async (snapshot, tmp) => {
     await admin.firestore().runTransaction((transaction) => {
-        transaction.update(snapshot.ref, config_1.default.outputFieldName, entities);
+        transaction.update(snapshot.ref, config_1.default.outputFieldName, tmp);
         return Promise.resolve();
     });
 };
