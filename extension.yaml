@@ -3,7 +3,7 @@ version: 0.0.1
 specVersion: v1beta  # Firebase Extensions specification version (do not edit)
 
 displayName: Sentence Categorization
-description: Determines the sentiment magnitude and score for given text values in Firestore
+description: Determines the topics for given text values in Firestore
 
 license: Apache-2.0  # The license you want for the extension
 
