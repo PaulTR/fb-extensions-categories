@@ -17,11 +17,11 @@ var ChangeType;
 
 admin.initializeApp();
 
-exports.fscategories = functions.handler.firestore.document.onWrite(async (change) => {
+exports.fssyntax = functions.handler.firestore.document.onWrite(async (change) => {
     const { inputFieldName, outputFieldName } = config_1.default;
 
     if (inputFieldName == outputFieldName) {
-        console.log("Category analysis: input field cannot be the same as output field. Please reconfigure your extension.");
+        console.log("Syntax analysis: input field cannot be the same as output field. Please reconfigure your extension.");
         return;
     }
     
@@ -40,7 +40,7 @@ exports.fscategories = functions.handler.firestore.document.onWrite(async (chang
         }
     }
     catch (err) {
-        console.log("Category extension error: " + err);
+        console.log("Syntax extension error: " + err);
     }
 });
 
@@ -60,7 +60,7 @@ const getChangeType = (change) => {
 const handleCreateDocument = async (snapshot) => {
     const input = extractInput(snapshot);
     if (input) {
-        await findCategories(snapshot);
+        await analyzeSyntax(snapshot);
     }
 };
 
@@ -76,40 +76,39 @@ const handleUpdateDocument = async (before, after) => {
             return;
         }
     if (inputAfter) {
-        await findCategories(after);
+        await analyzeSyntax(after);
     }
     else if (inputBefore) {
-        await updateCategories(after, admin.firestore.FieldValue.delete());
+        await updateSyntaxes(after, admin.firestore.FieldValue.delete());
     }
 };
 
-const findCategories = async (snapshot) => {
+const analyzeSyntax = async (snapshot) => {
     const input = extractInput(snapshot);
-    const result = await getCategories(input);
+    const result = await getSyntaxes(input);
     try {
-        await updateCategories(snapshot, result);
+        await updateSyntaxes(snapshot, result);
     }
     catch (err) {
         throw err;
     }
 };
 
-const getCategories = async (input_value) => {
+const getSyntaxes = async (input_value) => {
     try {
         const document = {
             content: input_value,
             type: 'PLAIN_TEXT',
         };
-        const [result] = await client.classifyText({document});
-        return result.categories;
+        const [result] = await client.analyzeSyntax({document});
+        return result.tokens;
     }
     catch (err) {
         throw err;
     }
 };
 
-//TODO change to array writing
-const updateCategories = async (snapshot, tmp) => {
+const updateSyntaxes = async (snapshot, tmp) => {
     await admin.firestore().runTransaction((transaction) => {
         transaction.update(snapshot.ref, config_1.default.outputFieldName, tmp);
         return Promise.resolve();
